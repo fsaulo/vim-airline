@@ -53,7 +53,7 @@ endfunction
 " }}}
 
 function! airline#parts#mode()
-  return airline#util#shorten(get(w:, 'airline_current_mode', ''), 79, 1)
+  return airline#util#shorten(get(w:, 'airline_current_mode', ''), 79, 6)
 endfunction
 
 function! airline#parts#crypt()
@@ -100,7 +100,7 @@ function! airline#parts#readonly()
 endfunction
 
 function! airline#parts#filetype()
-  return (airline#util#winwidth() < 90 && strlen(&filetype) > 3)
+  return (airline#util#winwidth() < 80 && strlen(&filetype) > 1)
         \ ? matchstr(&filetype, '...'). (&encoding is? 'utf-8' ? '…' : '>')
         \ : &filetype
 endfunction
