@@ -111,11 +111,11 @@ function! airline#extensions#tabline#buffers#get()
     let group = self.get_group(a:i)
     let pgroup = self.get_group(a:i - 1)
     " always add a space when powerline_fonts are used
-    " or for the very first item
-    if get(g:, 'airline_powerline_fonts', 0) || a:i == 0
-      let space = s:spc
+    " or for the very first item if padding is necessary
+    if get(g:, 'airline_powerline_fonts', 0) && a:i == 0
+      let space = get(g:, 'airline_remove_padding', 1) ? '' : s:spc
     else
-      let space= (pgroup == group ? s:spc : '')
+      let space = s:spc
     endif
 
     if get(g:, 'airline#extensions#tabline#buffer_idx_mode', 0)
