@@ -8,6 +8,7 @@ scriptencoding utf-8
 let s:show_message = get(g:, 'airline#extensions#whitespace#show_message', 1)
 let s:symbol = get(g:, 'airline#extensions#whitespace#symbol', g:airline_symbols.whitespace)
 let s:default_checks = ['indent', 'trailing', 'mixed-indent-file', 'conflicts']
+let s:searchcount = exists('*searchcount')
 
 let s:enabled = get(g:, 'airline#extensions#whitespace#enabled', 1)
 let s:skip_check_ft = {'make': ['indent', 'mixed-indent-file'],
@@ -51,8 +52,9 @@ endfunction
 
 function! s:conflict_marker()
   " Checks for git conflict markers
-  let annotation = '\%([0-9A-Za-z_.:]\+\)\?'
-  if match(['rst', 'markdown'], &ft) >= 0
+  " space required for jj conflict marker: #2727
+  let annotation = '\%([0-9A-Za-z_.: ]\+\)\?'
+  if match(['rst', 'markdown', 'rmd'], &ft) >= 0
     " rst filetypes use '=======' as header
     let pattern = '^\%(\%(<\{7} '.annotation. '\)\|\%(>\{7\} '.annotation.'\)\)$'
   else
@@ -60,6 +62,19 @@ function! s:conflict_marker()
   endif
   return search(pattern, 'nw')
 endfunction
+
+function! s:conflict_marker_count()
+  if !s:searchcount
+    return 0
+  endif
+  " Checks for git conflict markers
+  " space required for jj conflict marker: #2727
+  let annotation = '\%([0-9A-Za-z_.: ]\+\)\?'
+  let pattern = '^<\{7} '.annotation. '$'
+  let cnt = searchcount(#{pattern: pattern, recompute: 1, timeout: 10})
+  return has_key(cnt, 'total') ? cnt.total : 0
+endfunction
+
 
 function! airline#extensions#whitespace#check()
   let max_lines = get(g:, 'airline#extensions#whitespace#max_lines', 20000)
@@ -78,7 +93,8 @@ function! airline#extensions#whitespace#check()
     let check = 'trailing'
     if index(checks, check) > -1 && index(get(skip_check_ft, &ft, []), check) < 0
       try
-        let regexp = get(g:, 'airline#extensions#whitespace#trailing_regexp', '\s$')
+        let regexp = get(b:, 'airline_whitespace_trailing_regexp',
+              \ get(g:, 'airline#extensions#whitespace#trailing_regexp', '\s$'))
         let trailing = search(regexp, 'nw')
       catch
         call airline#util#warning(printf('Whitespace: error occurred evaluating "%s"', regexp))
@@ -107,6 +123,7 @@ function! airline#extensions#whitespace#check()
     let conflicts = 0
     if index(checks, 'conflicts') > -1
       let conflicts = s:conflict_marker()
+      let conflicts_count = s:conflict_marker_count()
     endif
 
     if trailing != 0 || mixed != 0 || long != 0 || !empty(mixed_file) || conflicts != 0
@@ -137,6 +154,9 @@ function! airline#extensions#whitespace#check()
         if conflicts != 0
           let conflicts_fmt = get(g:, 'airline#extensions#whitespace#conflicts_format', '[%s]conflicts')
           let b:airline_whitespace_check .= space.printf(conflicts_fmt, conflicts)
+          if conflicts_count > 1
+            let b:airline_whitespace_check .= printf('*%d', conflicts_count)
+          endif
         endif
       endif
     endif
