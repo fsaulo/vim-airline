@@ -118,9 +118,9 @@ function! airline#init#bootstrap()
 
   if get(g:, 'airline_powerline_fonts', 0)
     " Symbols for Powerline terminals
-    call s:check_defined('g:airline_left_sep', "\ue0b0")      " 
+    call s:check_defined('g:airline_left_sep', "\ue0b1")      " 
     call s:check_defined('g:airline_left_alt_sep', "\ue0b1")  " 
-    call s:check_defined('g:airline_right_sep', "\ue0b2")     " 
+    call s:check_defined('g:airline_right_sep', "\ue0b3")     " 
     call s:check_defined('g:airline_right_alt_sep', "\ue0b3") " 
     " ro=, ws=☲, lnr=, mlnr=☰, colnr=℅, br=, nx=Ɇ, crypt=🔒, dirty=⚡
     "  Note: For powerline, we add an extra space after maxlinenr symbol,
@@ -172,9 +172,9 @@ function! airline#init#bootstrap()
     call extend(g:airline_symbols, {
           \ 'readonly': 'RO',
           \ 'whitespace': '!',
-          \ 'linenr': ' ln:',
+          \ 'linenr': 'ln',
           \ 'maxlinenr': '',
-          \ 'colnr': ' cn:',
+          \ 'colnr': 'co',
           \ 'branch': '',
           \ 'notexists': '?',
           \ 'crypt': 'cr',
@@ -207,15 +207,15 @@ function! airline#init#bootstrap()
         \ 'raw': '%{g:airline_symbols.linenr}%2l',
         \ 'accent': 'bold'})
   call airline#parts#define('maxlinenr', {
-        \ 'raw': '/%L%{g:airline_symbols.maxlinenr}',
+        \ 'raw': '/%L%{g:airline_symbols.maxlinenr} :',
         \ 'accent': 'bold'})
   call airline#parts#define('colnr', {
-        \ 'raw': '%{g:airline_symbols.colnr}%v',
+        \ 'raw': ' %{g:airline_symbols.colnr}:%v',
         \ 'accent': 'bold'})
   call airline#parts#define_function('ffenc', 'airline#parts#ffenc')
   call airline#parts#define('hunks', {
         \ 'raw': '',
-        \ 'minwidth': 100})
+        \ 'minwidth': 70})
   call airline#parts#define('branch', {
         \ 'raw': '',
         \ 'minwidth': 80})
@@ -270,7 +270,7 @@ function! airline#init#sections()
     if exists("+autochdir") && &autochdir == 1
       let g:airline_section_c = airline#section#create(['%<', 'path', spc, 'readonly', 'coc_status', 'lsp_progress'])
     else
-      let g:airline_section_c = airline#section#create(['%<', 'file', spc, 'readonly', 'coc_status', 'lsp_progress'])
+      let g:airline_section_c = airline#section#create(['%<', 'file', spc, 'readonly', 'coc_status', 'obsession', 'lsp_progress'])
     endif
   endif
   if !exists('g:airline_section_gutter')
@@ -284,9 +284,9 @@ function! airline#init#sections()
   endif
   if !exists('g:airline_section_z')
     if airline#util#winwidth() > 79
-      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', '%p%%', 'linenr', 'maxlinenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['%p%%'.spc, 'linenr', 'maxlinenr', 'colnr'])
     else
-      let g:airline_section_z = airline#section#create(['%p%%', 'linenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['%p%%'.spc, 'linenr', 'colnr'])
     endif
   endif
   if !exists('g:airline_section_error')

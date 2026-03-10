@@ -23,12 +23,17 @@ function! s:get_section(winnr, key, ...)
       return ''
     endif
   endif
-  let spc = g:airline_symbols.space
   if !exists('g:airline_section_{a:key}')
     return ''
   endif
+  let spc = g:airline_symbols.space
   let text = airline#util#getwinvar(a:winnr, 'airline_section_'.a:key, g:airline_section_{a:key})
-  let [prefix, suffix] = [get(a:000, 0, '%('.spc), get(a:000, 1, spc.'%)')]
+  if get(g:, 'airline_remove_padding', 1)
+    let prefix = a:key == 'a' ? get(a:000, 0, '%('.'') : get(a:000, 0, '%('.spc)
+    let suffix = a:key == 'z' ? get(a:000, 1, ''.'%)') : get(a:000, 1, spc.'%)')
+  else
+      let [prefix, suffix] = [get(a:000, 0, '%('.spc), get(a:000, 1, spc.'%)')]
+  endif
   return empty(text) ? '' : prefix.text.suffix
 endfunction
 

@@ -11,7 +11,7 @@ endif
 let s:spc = g:airline_symbols.space
 
 if !exists('g:airline#extensions#obsession#indicator_text')
-  let g:airline#extensions#obsession#indicator_text = '$'
+  let g:airline#extensions#obsession#indicator_text = '⚒ '
 endif
 
 if !exists('g:airline#extensions#obsession#indicator_text_paused')
